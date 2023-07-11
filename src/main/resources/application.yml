@@ -1,0 +1,90 @@
+management.health.circuitbreakers.enabled: true
+management.endpoint.health:
+    enabled: true
+    show-details: always
+resilience4j.circuitbreaker:
+    configs:
+        default:
+            registerHealthIndicator: true
+    instances:
+        nounservice:
+            registerHealthIndicator: true
+            ringBufferSizeInClosedState: 20
+            ringBufferSizeInHalfOpenState: 10
+            waitDurationInOpenState: 3s
+            failureRateThreshold: 15
+            recordExceptions:
+              - org.springframework.web.client.HttpServerErrorException
+              - java.io.IOException
+              - java.lang.IllegalStateException
+              - java.util.concurrent.TimeoutException
+              - org.springframework.web.client.ResourceAccessException
+              - java.lang.RuntimeException
+        verbservice:
+            registerHealthIndicator: true
+            ringBufferSizeInClosedState: 20
+            ringBufferSizeInHalfOpenState: 10
+            waitDurationInOpenState: 3s
+            failureRateThreshold: 15
+            recordExceptions:
+              - org.springframework.web.client.HttpServerErrorException
+              - java.io.IOException
+              - java.lang.IllegalStateException
+              - java.util.concurrent.TimeoutException
+              - org.springframework.web.client.ResourceAccessException
+              - java.lang.RuntimeException
+        adverbservice:
+            registerHealthIndicator: true
+            ringBufferSizeInClosedState: 20
+            ringBufferSizeInHalfOpenState: 10
+            waitDurationInOpenState: 3s
+            failureRateThreshold: 15
+            recordExceptions:
+              - org.springframework.web.client.HttpServerErrorException
+              - java.io.IOException
+              - java.lang.IllegalStateException
+              - java.util.concurrent.TimeoutException
+              - org.springframework.web.client.ResourceAccessException
+              - java.lang.RuntimeException
+resilience4j.bulkhead:
+    instances:
+        bulkheadnounservice:
+            maxWaitDuration: 5ms
+            maxConcurrentCalls: 25
+        bulkheadverbservice:
+            maxWaitDuration: 5ms
+            maxConcurrentCalls: 25
+        bulkheadadverbservice:
+            maxWaitDuration: 5ms
+            maxConcurrentCalls: 25
+resilience4j.retry:
+    instances:
+        retrynounservice:
+            maxretryAttempts: 2
+            waitDuration: 1000
+            retry-exceptions:
+              - java.util.concurrent.TimeoutException
+        retryverbservice:
+            maxretryAttempts: 2
+            waitDuration: 1000
+            retry-exceptions:
+              - java.util.concurrent.TimeoutException
+        retryadverbservice:
+            maxretryAttempts: 2
+            waitDuration: 1000
+            retry-exceptions:
+              - java.util.concurrent.TimeoutException
+resilience4j.ratelimiter:
+    instances:
+        ratelimiternounservice:
+            timeoutDuration: 1000
+            limitRefreshPeriod: 5000
+            limitForPeriod: 5
+        ratelimiterverbservice:
+            timeoutDuration: 1000
+            limitRefreshPeriod: 5000
+            limitForPeriod: 5
+        ratelimiteradverbservice:
+            timeoutDuration: 1000
+            limitRefreshPeriod: 5000
+            limitForPeriod: 5
