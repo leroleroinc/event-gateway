@@ -25,7 +25,7 @@ public class NounService {
 	public Flux<String> randomNounList(Integer size) {
 		Message<String> nounCount = MessageBuilder.withPayload(size.toString()).build();
 		streamBridge.send("nounsupplier-out-0", nounCount);
-		System.out.println("GATEWAY: Producing " + size);
+		System.out.println("GATEWAY.NOUN: Producing " + size);
 		return stream.take(size);
 	}
 

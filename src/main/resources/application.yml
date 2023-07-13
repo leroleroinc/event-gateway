@@ -11,3 +11,9 @@ spring:
                     destination: nounrequest
                 nounconsumer-in-0:
                     destination: nounresponse
+                verbsupplier-out-0:
+                    destination: verbrequest
+                verbconsumer-in-0:
+                    destination: verbresponse
+        function:
+            definition: nounconsumer;verbconsumer
