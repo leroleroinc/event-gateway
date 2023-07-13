@@ -12,6 +12,7 @@ import org.springframework.messaging.support.MessageBuilder;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
+import reactor.core.publisher.Sinks;
 import java.util.function.Consumer;
 
 @Service
@@ -23,7 +24,9 @@ public class NounService {
 
 	@Autowired
 	private StreamBridge streamBridge;
-	private WordSink nounSink = new WordSink();
+	private StringSink sink = new StringSink();
+	//private Sinks.Many<String> sink = Sinks.many().multicast().onBackpressureBuffer();
+	private Flux<String> stream = Flux.create(sink).share();
 
 	public Flux<String> randomNounList(Integer size) {
 //		return webClient.get()
@@ -33,7 +36,11 @@ public class NounService {
 		Message<String> nounCount = MessageBuilder.withPayload(size.toString()).build();
 		streamBridge.send("nounsupplier-out-0", nounCount);
 		System.out.println("GATEWAY: Producing " + size);
-		return Flux.create(nounSink).take(size);
+		//return Flux.create(nounSink).take(size);
+//		return sink.asFlux()
+//			.take(size);
+			//.doOnTerminate(() -> sink = Sinks.many().multicast().onBackpressureBuffer());
+		return stream.take(size);
 	}
 
 //	public Flux<String> randomNounEvents(Integer interval) {
@@ -48,11 +55,22 @@ public class NounService {
 		for (int i = 0; i < 200; i++) System.out.println("GATEWAY CONSUMER");
 		return noun -> {
 			System.out.println("GATEWAY: Consuming " + noun);
-			nounSink.produce(noun);
+			sink.produce(noun);
+			//Sinks.EmitResult r = sink.tryEmitNext(noun);
+			//System.out.println(r.isSuccess());
+
+		//	sink.emitNext(noun, new Sinks.EmitFailureHandler() {
+		//		@Override
+		//		public boolean onEmitFailure(reactor.core.publisher.SignalType s, Sinks.EmitResult r) {
+		//			System.out.println(r.isSuccess());
+		//			sink = Sinks.many().multicast().onBackpressureBuffer();
+		//			return false;
+		//		}
+		//	});
 		};
 	}
 
-	private class WordSink implements Consumer<FluxSink<String>> {
+	private class StringSink implements Consumer<FluxSink<String>> {
 		private FluxSink<String> sink;
 		@Override
 		public void accept(FluxSink<String> sink) {
