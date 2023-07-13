@@ -23,9 +23,4 @@ public class AdverbController {
 		return adverbService.randomAdverbList(size);
 	}
 
-	@GetMapping(path = "/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<String> getEvents(@RequestParam(defaultValue = "200") Integer interval) {
-		return adverbService.randomAdverbEvents(interval).onBackpressureDrop();
-	}
-
 }

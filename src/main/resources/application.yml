@@ -15,5 +15,9 @@ spring:
                     destination: verbrequest
                 verbconsumer-in-0:
                     destination: verbresponse
+                adverbsupplier-out-0:
+                    destination: adverbrequest
+                adverbconsumer-in-0:
+                    destination: adverbresponse
         function:
-            definition: nounconsumer;verbconsumer
+            definition: nounconsumer;verbconsumer;adverbconsumer

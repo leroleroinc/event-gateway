@@ -1,37 +1,51 @@
 package com.lerolero.gateway.services;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
+import java.util.function.Consumer;
 
 @Service
 public class AdverbService {
 
 	@Autowired
-	@Qualifier("adverbsWebClient")
-	private WebClient webClient;
-
-//	@Autowired
-//	private AdverbService(@Value("${webservice.adverbs.baseurl}") String baseURL) {
-//		this.webClient = WebClient.create(baseURL);
-//	}
+	private StreamBridge streamBridge;
+	private StringSink sink = new StringSink();
+	private Flux<String> stream = Flux.create(sink).share();
 
 	public Flux<String> randomAdverbList(Integer size) {
-		return webClient.get()
-			.uri("/adverbs?size=" + size)
-			.retrieve()
-			.bodyToFlux(String.class);
+		Message<String> adverbCount = MessageBuilder.withPayload(size.toString()).build();
+		streamBridge.send("adverbsupplier-out-0", adverbCount);
+		System.out.println("GATEWAY.ADVERB: Producing " + size);
+		return stream.take(size);
 	}
 
-	public Flux<String> randomAdverbEvents(Integer interval) {
-		return webClient.get()
-			.uri("/adverbs/events?interval=" + interval)
-			.retrieve()
-			.bodyToFlux(String.class);
+	@Bean
+	public Consumer<String> adverbconsumer() {
+		return adverb -> {
+			System.out.println("GATEWAY: Consuming " + adverb);
+			sink.produce(adverb);
+		};
+	}
+
+	private class StringSink implements Consumer<FluxSink<String>> {
+		private FluxSink<String> sink;
+		@Override
+		public void accept(FluxSink<String> sink) {
+			this.sink = sink;
+		}
+		public void produce(String word) {
+			this.sink.next(word);
+		}
 	}
 
 }
