@@ -32,7 +32,7 @@ public class AdverbService {
 	@Bean
 	public Consumer<String> adverbconsumer() {
 		return adverb -> {
-			System.out.println("GATEWAY: Consuming " + adverb);
+			System.out.println("GATEWAY.ADVERB: Consuming " + adverb);
 			sink.produce(adverb);
 		};
 	}
@@ -43,8 +43,8 @@ public class AdverbService {
 		public void accept(FluxSink<String> sink) {
 			this.sink = sink;
 		}
-		public void produce(String word) {
-			this.sink.next(word);
+		public void produce(String s) {
+			this.sink.next(s);
 		}
 	}
 

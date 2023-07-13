@@ -32,7 +32,7 @@ public class NounService {
 	@Bean
 	public Consumer<String> nounconsumer() {
 		return noun -> {
-			System.out.println("GATEWAY: Consuming " + noun);
+			System.out.println("GATEWAY.NOUN: Consuming " + noun);
 			sink.produce(noun);
 		};
 	}
@@ -43,8 +43,8 @@ public class NounService {
 		public void accept(FluxSink<String> sink) {
 			this.sink = sink;
 		}
-		public void produce(String word) {
-			this.sink.next(word);
+		public void produce(String s) {
+			this.sink.next(s);
 		}
 	}
 

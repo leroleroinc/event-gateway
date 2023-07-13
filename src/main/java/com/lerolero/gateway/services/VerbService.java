@@ -32,7 +32,7 @@ public class VerbService {
 	@Bean
 	public Consumer<String> verbconsumer() {
 		return verb -> {
-			System.out.println("GATEWAY: Consuming " + verb);
+			System.out.println("GATEWAY.VERB: Consuming " + verb);
 			sink.produce(verb);
 		};
 	}
@@ -43,8 +43,8 @@ public class VerbService {
 		public void accept(FluxSink<String> sink) {
 			this.sink = sink;
 		}
-		public void produce(String word) {
-			this.sink.next(word);
+		public void produce(String s) {
+			this.sink.next(s);
 		}
 	}
 
